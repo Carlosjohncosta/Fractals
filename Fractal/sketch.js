@@ -45,7 +45,7 @@ function draw() {
 	}
 	colorLoop ++;
 	console.log(colorLoop)
-	updatePixels();
+	updatePixels(); //test
 }
 
 
@@ -83,8 +83,8 @@ let gridProperties = (x, y) => {
 		},
 		itterate(){
 			if (this.inSet == true){
-				this._prev = shipCalc(this._prev, this.value);
-				//this._prev = mandelbrotCalc(this._prev, this.value);
+				//this._prev = shipCalc(this._prev, this.value);
+				this._prev = mandelbrotCalc(this._prev, this.value);
 				//this._prev = miscCalc(this._prev);
 				this._inSet = (checkDivergance(this._prev));
 			}	
