@@ -65,10 +65,10 @@ let gridProperties = (x, y) => {
 		_real: xOffset + (x  - width / 2) / (width / (8 / zoom)),
 		_imaginary: yOffset + (y - height / 2) / -(height / (4 / zoom)),
 		_prev: {
-			//real: xOffset + (x  - width / 2) / (width / (8 / zoom)), //set values to zero if not using julia set
-			//imaginary: yOffset + (y - height / 2) / -(height / (4 / zoom)), 
-			real: 0, //set values to zero if not using julia set
-			imaginary: 0,
+			real: xOffset + (x  - width / 2) / (width / (8 / zoom)), //set values to zero if not using julia set
+			imaginary: yOffset + (y - height / 2) / -(height / (4 / zoom)), 
+			//real: 0, //set values to zero if not using julia set
+			//imaginary: 0,
 		},
 		changed: false,
 		_inSet: true,
@@ -84,8 +84,8 @@ let gridProperties = (x, y) => {
 		itterate(){
 			if (this.inSet == true){
 				//this._prev = shipCalc(this._prev, this.value);
-				this._prev = mandelbrotCalc(this._prev, this.value);
-				//this._prev = miscCalc(this._prev);
+				//this._prev = mandelbrotCalc(this._prev, this.value);
+				this._prev = miscCalc(this._prev);
 				this._inSet = (checkDivergance(this._prev));
 			}	
 		}
