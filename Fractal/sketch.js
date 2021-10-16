@@ -5,7 +5,9 @@ let xOffset = 0; //real plain offset
 let yOffset = 0; //sets Y value 
 let colorLoop = 0; //loop ror changing colors depending on itteration
 let colour; 
-
+let changeTime = 25;
+let changeSpeed = 6;
+let juliaVals = [0.01, -0.2];
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
@@ -25,9 +27,12 @@ function draw() {
 			if (grid[x][y].inSet == true){
 				set(x, y, 0);
 			} else {
-				set(x, y, color(grid[x][y].color.R, grid[x][y].color.G, grid[x][y].color.B,));
+				set(x, y, color(grid[x][y].color.R, grid[x][y].color.G, grid[x][y].color.B));
 			}
 		}
+	}
+	if (itteration == 50){
+		//noLoop();
 	}
 	colorLoop ++;
 	updatePixels(); 
@@ -69,7 +74,7 @@ let gridProperties = (x, y) => {
 		color : {
 			R: 0,
 			G: 0,
-			B: 255
+			B: 255,
 		},
 		itterate(){
 			if (this.inSet == true){
@@ -78,8 +83,14 @@ let gridProperties = (x, y) => {
 				this._prev = miscCalc(this._prev);
 				this._inSet = (checkDivergance(this._prev));
 				if (this._inSet == false) {
-					this.color.R += itteration * 6;
-					this.color.G += itteration * 6;
+					if (itteration < changeTime) {
+						this.color.R += itteration * changeSpeed;
+						this.color.G += itteration * changeSpeed;
+					} else {
+						this.color.G -= (itteration - changeTime) * changeSpeed;
+						this.color.R += itteration * changeSpeed;
+						this.color.G += itteration * changeSpeed;
+					}
 				}
 			}	
 		}
@@ -130,8 +141,8 @@ function shipCalc(prev, current){
 
 function miscCalc(prev, current){ 
 	let squarePrev = [Math.pow(prev.real, 2) - Math.pow(prev.imaginary, 2), 2 * (prev.real * prev.imaginary)]
-	let realNums = squarePrev[0] - 0.8;
-	let imaginaryNums = squarePrev[1] + 0.156;
+	let realNums = squarePrev[0] + juliaVals[0];
+	let imaginaryNums = squarePrev[1] + juliaVals[1];
 	return {
 		real: realNums,
 		imaginary: imaginaryNums 	
