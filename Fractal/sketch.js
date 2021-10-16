@@ -18,34 +18,19 @@ function setup() {
 
 function draw() {
 	update();
-	itteration += 5;
+	itteration += 1;
 	colorLoop > 2 ? colorLoop = 0 : 0;
 	for (let y = 0; y < height; y++){
 		for (let x = 0; x < width; x++){
 			if (grid[x][y].inSet == true){
 				set(x, y, 0);
 			} else {
-				if (grid[x][y].changed == false){
-					switch (colorLoop){
-						case 0:
-							colour = color(0, 0, 255 - itteration);
-							break;
-						case 1:
-							colour = color(0, 255 - itteration, 0);
-							break;
-						case 2:
-							colour = color(255 - itteration, 0, 0);
-							break;
-					}
-					set(x, y, colour);
-					grid[x][y].changed = true;
-				}
+				set(x, y, color(grid[x][y].color.R, grid[x][y].color.G, grid[x][y].color.B,));
 			}
 		}
 	}
 	colorLoop ++;
-	console.log(colorLoop)
-	updatePixels(); //test
+	updatePixels(); 
 }
 
 
@@ -81,12 +66,21 @@ let gridProperties = (x, y) => {
 		get inSet(){
 			return this._inSet
 		},
+		color : {
+			R: 0,
+			G: 0,
+			B: 255
+		},
 		itterate(){
 			if (this.inSet == true){
 				//this._prev = shipCalc(this._prev, this.value);
 				//this._prev = mandelbrotCalc(this._prev, this.value);
 				this._prev = miscCalc(this._prev);
 				this._inSet = (checkDivergance(this._prev));
+				if (this._inSet == false) {
+					this.color.R += itteration * 6;
+					this.color.G += itteration * 6;
+				}
 			}	
 		}
 	}
@@ -136,8 +130,8 @@ function shipCalc(prev, current){
 
 function miscCalc(prev, current){ 
 	let squarePrev = [Math.pow(prev.real, 2) - Math.pow(prev.imaginary, 2), 2 * (prev.real * prev.imaginary)]
-	let realNums = squarePrev[0] - 0.3;
-	let imaginaryNums = squarePrev[1] - 0.7;
+	let realNums = squarePrev[0] - 0.8;
+	let imaginaryNums = squarePrev[1] + 0.156;
 	return {
 		real: realNums,
 		imaginary: imaginaryNums 	
