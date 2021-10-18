@@ -1,6 +1,6 @@
-let xOffset = -1.5;
+let xOffset = 0;
 let yOffset = 0;
-let zoom = 20;
+let zoom = 1;
 let maxItt = 50;
 
 function setup() {
@@ -13,8 +13,10 @@ function setup() {
 function draw() {
     for (let y = 0; y < height; y++){
 		for (let x = 0; x < width; x++){
-            let pos = math.complex(xOffset + (x  - width / 2) / (width / (8 / zoom)), 
-            yOffset + (y - height / 2) / -(height / (4 / zoom)));
+            let pos = {
+                real: xOffset + (x  - width / 2) / (width / (8 / zoom)),
+                imaginary: yOffset + (y - height / 2) / - (height / (4 / zoom))
+            };
             let pointVal = mandelbrotCalc(pos)
             let hue = 100 * (pointVal / maxItt);
             let c = color(hue, 100, 100);
@@ -31,9 +33,13 @@ function draw() {
 }
 
 function mandelbrotCalc(pos) {
-    let temp = math.complex(0, 0);
+    let temp = {
+        real: 0,
+        imaginary: 0
+    };
     for (let i = 0; i < maxItt; i++) {
-        temp = math.add(pos, math.multiply(temp, temp));
+        temp = comPow(temp, 2);
+        temp = comAdd(pos, temp);
         if (checkDist(temp) >= 2) {
             return i;
         }
@@ -42,7 +48,26 @@ function mandelbrotCalc(pos) {
 }
 
 let checkDist = val => {
-    let a = val.re * val.re;
-    let b = val.im * val.im;
+    let a = val.real * val.real;
+    let b = val.imaginary * val.imaginary;
     return Math.sqrt(a + b);
+}
+
+let comPow = (comNum, power) => {
+    let square = { 
+        real: Math.pow(comNum.real, 2) - Math.pow(comNum.imaginary, 2), 
+        imaginary: 2 * (comNum.real * comNum.imaginary)
+    };
+    if(power > 1) {
+        return comPow(square, power - 1);
+    } else {
+        return comNum;
+    };
+}
+
+let comAdd = (a, b) => {
+    return {
+        real: a.real + b.real,
+        imaginary: a.imaginary + b.imaginary
+    }
 }
