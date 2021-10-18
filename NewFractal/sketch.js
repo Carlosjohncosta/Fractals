@@ -1,21 +1,30 @@
 let xOffset = 0;
 let yOffset = 0;
-let zoom = 1;
-let maxItt = 50;
+let zoom = 1.5;
+let maxItt = 1000;
+let nextFrame = true;
+let juliaVal = {
+    real: -0,
+    imaginary: -0.8
+}
+let width;
+let height;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
-	var width = windowWidth;
-	var height = windowHeight;
+    width = windowWidth / 2;
+    height = windowHeight / 2;
+    background(200);
     colorMode(HSB, 100);
 }
 
 function draw() {
+    if (nextFrame) { 
     for (let y = 0; y < height; y++){
 		for (let x = 0; x < width; x++){
             let pos = {
-                real: xOffset + (x  - width / 2) / (width / (8 / zoom)),
-                imaginary: yOffset + (y - height / 2) / - (height / (4 / zoom))
+                real: xOffset + (x  - width/2) / (width / (8 / zoom)),
+                imaginary: yOffset + (y - height/2) / - (height / (4 / zoom))
             };
             let pointVal = mandelbrotCalc(pos)
             let hue = 100 * (pointVal / maxItt);
@@ -29,17 +38,27 @@ function draw() {
             }
         }
     }
-    noLoop();
+    nextFrame = false;
+    }
 }
+
+function mouseClicked() {
+    xOffset += (mouseX  - width / 2) / (width / (8 / zoom));
+    yOffset += (mouseY - height / 2) / - (height / (4 / zoom));
+    zoom *= 20;
+    nextFrame = true;
+}
+
 
 function mandelbrotCalc(pos) {
     let temp = {
         real: 0,
         imaginary: 0
     };
+    temp = pos;
     for (let i = 0; i < maxItt; i++) {
         temp = comPow(temp, 2);
-        temp = comAdd(pos, temp);
+        temp = comAdd(juliaVal, temp);
         if (checkDist(temp) >= 2) {
             return i;
         }
