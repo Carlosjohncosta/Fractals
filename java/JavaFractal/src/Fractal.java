@@ -1,87 +1,103 @@
-import processing.core.*;
-public class Fractal extends PApplet {
+import processing.core.*; //imports processing into project.
 
-    public static void main(String[] args) {
+public class Fractal extends PApplet {
+    public static void main(String[] args) { //initialises applet.
         PApplet.main("Fractal");
     }
-    
-    int maxItt = 1000;
-    double xOffset = 0;
-    double yOffset = 0;
-    double zoom = 0.8; 
-    int power = 2;
-    boolean abs = false;
-    boolean showJulia = false;
-    comNum juliaVal = new comNum(-0.7269, 0.1889);
-    int width;
-    int height;
 
-    public void settings() {
+    
+    int maxIt = 1000; //maximum number of iterations.
+    static double xOffset = 0; //X offset (real plain)
+    static double yOffset = 0; //Y offset (imaginary plain)
+    static double zoom = 0.8; //Zoom of fractal. 
+    int power = 2; //power used in fractal (use 2 for mandelbbrot and burning ship)
+    boolean abs = false; //if true, power will be calculated as an absolute value.
+    boolean showJulia = false; //Shows julia set for given complex num bellow.
+    comNum juliaVal = new comNum(0, -0.8);
+    static int width; //width of screen
+    static int height; //height of screen
+    //static variables are used for comNum.translate.
+    
+    public void settings() { //initialises screen (settings is used as setup does not allow variable assignment for size.)
         width = (int)(displayWidth / 2);
         height = (int)(width / 2);
         size(width, height);
         //fullScreen();
     }
 
-    public void setup() {
+    public void setup() { //changes color to HSB mode.
         colorMode(HSB, 100);
         pixelDensity(1);
     }
 
-    public void draw() {
-        for (int y = 0; y < height; y++) {
+    public void draw() { //draw loop, updates every cycle.
+        for (int y = 0; y < height; y++) { //nested loop to check each pixel on screen.
             for (int x = 0; x < width; x++) {
-                comNum point = new comNum(translate("X", x), translate("Y", y));
-                int pointVal = fracCalc(point);
-                int colorLoop = pointVal;
-                float colorNum = maxItt / 30;
-                while (colorLoop > maxItt / colorNum) {
+                comNum point = new comNum(comNum.translate("X", x), 
+                comNum.translate("Y", y)); //Creates new comNum, with x and y translated from pixel pos to complex num.
+                
+                int pointVal = fracCalc(point); //returns num of iterations until escape from abs value 2.
+                int colorLoop = pointVal; //bellow is used to calculate color of pixel.
+                float colorNum = maxIt / 30;
+                while (colorLoop > maxIt / colorNum) {
                     colorLoop -= colorNum;
                 }
-                float hue = 100 * (colorLoop / (maxItt / colorNum));
-                if (pointVal < maxItt) {
-                    set(x, y, color(hue, 100, 100));
+                float hue = 100 * (colorLoop / (maxIt / colorNum));
+                if (pointVal < maxIt) { 
+                    set(x, y, color(hue, 100, 100)); //set to color if not in set.
                 } else {
-                    set(x, y, color(0, 0, 0));
+                    set(x, y, color(0, 0, 0)); //set to black if is in set.
                 }
             }
         }
-        noLoop();
+        noLoop(); //stops loop until loop() is called.
     }
 
-    public void mousePressed() {
+    public void mousePressed() { //used to zoom in, translates pos of mouse and increases/decreases zoom.
+    	xOffset = comNum.translate("X", mouseX);
+        yOffset = comNum.translate("Y", mouseY);
+        
         if (mouseButton == LEFT) {
-            xOffset = translate("X", mouseX);
-            yOffset = translate("Y", mouseY);
             zoom *= 20;
-            loop();
         } else if (mouseButton == RIGHT) {
-            xOffset = translate("X", mouseX);
-            yOffset = translate("Y", mouseY);
             zoom /= 20;
-            loop();
         }
+        
+        loop();
     }
 
-    public void keyPressed() {
-    	String s = "s";
+    public void keyPressed() { //backspace resets values, s saves image.
+
         if (keyCode == BACKSPACE) {
-        	xOffset = 0;
-            yOffset = 0;
-            zoom = 0.8;
-            loop();
+        	reset();
         }
-        if (key == s.charAt(0)) {
+        if (key == 's' ) {
             saveFrame((xOffset) + " " + (yOffset) + "i " + Math.floor(zoom) + "x.png");
         }
+        if(key == 'a') {
+        	if (abs == true) {
+        		abs = false;
+        	} else {
+        		abs = true;
+        	}
+        	reset();
+        }
+        if (key == 'j') {
+        	if (showJulia == true) {
+        		showJulia = false;
+        	} else {
+        		showJulia = true;
+        	}
+        	reset();
+        }
     }
 
-    int fracCalc(comNum point) {
+    int fracCalc(comNum point) { //algorithm to check divergence from abs val 2.
         comNum prev = new comNum(0, 0);
         if (showJulia) {
             prev = point;
         }
-        for (int i = 0; i < maxItt; i++) {
+        for (int i = 0; i < maxIt; i++) {
             prev.Pow(power, abs);
             if (showJulia) {
                 prev.Add(juliaVal);
@@ -92,17 +108,13 @@ public class Fractal extends PApplet {
                 return i;
             }
         }
-        return maxItt;
+        return maxIt;
     }
-
-
-    double translate(String axis, double coord) {
-        if (axis == "X") {
-            return xOffset + (coord - width / 2) / ((width * zoom) / 4);
-        } else if (axis == "Y") {
-            return yOffset + (coord - height / 2) / -((height * zoom) / 2);
-        } else {
-            return 0;
-        }
+    
+    void reset() {
+    	xOffset = 0;
+        yOffset = 0;
+        zoom = 0.8;
+        loop();
     }
-}
+} 
