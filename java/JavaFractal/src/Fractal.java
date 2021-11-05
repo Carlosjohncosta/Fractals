@@ -13,7 +13,7 @@ public class Fractal extends PApplet {
     int power = 2; //power used in fractal (use 2 for mandelbbrot and burning ship)
     boolean abs = false; //if true, power will be calculated as an absolute value.
     boolean showJulia = false; //Shows julia set for given complex num bellow.
-    comNum juliaVal = new comNum(0, -0.8);
+    comNum juliaVal = new comNum(0, 0);
     static int width; //width of screen
     static int height; //height of screen
     //static variables are used for comNum.translate.
@@ -44,52 +44,57 @@ public class Fractal extends PApplet {
                 }
                 float hue = 100 * (colorLoop / (maxIt / colorNum));
                 if (pointVal < maxIt) { 
-                    set(x, y, color(hue, 100, 100)); //set to color if not in set.
+                	set(x, y, color(hue, 100, 100)); //set to color if not in set.
                 } else {
                     set(x, y, color(0, 0, 0)); //set to black if is in set.
                 }
             }
         }
-        noLoop(); //stops loop until loop() is called.
+        if (!showJulia) {
+        	noLoop();
+        }
+    }
+    
+    public void mouseMoved() { //sets juliaVal to position of mouse
+    	juliaVal = new comNum(comNum.translate("X", mouseX), 
+    	comNum.translate("Y", mouseY));
     }
 
     public void mousePressed() { //used to zoom in, translates pos of mouse and increases/decreases zoom.
     	xOffset = comNum.translate("X", mouseX);
         yOffset = comNum.translate("Y", mouseY);
         
-        if (mouseButton == LEFT) {
+    	if (mouseButton == LEFT) {
             zoom *= 20;
         } else if (mouseButton == RIGHT) {
             zoom /= 20;
         }
-        
-        loop();
-    }
+    	loop();
+    } 
 
-    public void keyPressed() { //backspace resets values, s saves image.
-
+    public void keyReleased() { //used for key presses
         if (keyCode == BACKSPACE) {
         	reset();
         }
-        if (key == 's' ) {
+        else if (key == 's' ) {
             saveFrame((xOffset) + " " + (yOffset) + "i " + Math.floor(zoom) + "x.png");
         }
-        if(key == 'a') {
+        else if(key == 'a') {
         	if (abs == true) {
         		abs = false;
         	} else {
         		abs = true;
         	}
-        	reset();
         }
-        if (key == 'j') {
+        else if (key == 'j') {
+        	println("here");
         	if (showJulia == true) {
         		showJulia = false;
         	} else {
         		showJulia = true;
         	}
-        	reset();
         }
+        loop();
     }
 
     int fracCalc(comNum point) { //algorithm to check divergence from abs val 2.
