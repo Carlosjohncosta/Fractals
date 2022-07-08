@@ -5,7 +5,9 @@ let xOffset = 0; //real plain offset
 let yOffset = 0; //sets Y value 
 let colorLoop = 0; //loop ror changing colors depending on itteration
 let colour; 
-
+let changeTime = 25;
+let changeSpeed = 6;
+let juliaVals = [0.01, -0.2];
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
@@ -18,34 +20,22 @@ function setup() {
 
 function draw() {
 	update();
-	itteration += 5;
+	itteration += 1;
 	colorLoop > 2 ? colorLoop = 0 : 0;
 	for (let y = 0; y < height; y++){
 		for (let x = 0; x < width; x++){
 			if (grid[x][y].inSet == true){
 				set(x, y, 0);
 			} else {
-				if (grid[x][y].changed == false){
-					switch (colorLoop){
-						case 0:
-							colour = color(0, 0, 255 - itteration);
-							break;
-						case 1:
-							colour = color(0, 255 - itteration, 0);
-							break;
-						case 2:
-							colour = color(255 - itteration, 0, 0);
-							break;
-					}
-					set(x, y, colour);
-					grid[x][y].changed = true;
-				}
+				set(x, y, color(grid[x][y].color.R, grid[x][y].color.G, grid[x][y].color.B));
 			}
 		}
 	}
+	if (itteration == 50){
+		//noLoop();
+	}
 	colorLoop ++;
-	console.log(colorLoop)
-	updatePixels(); //test
+	updatePixels(); 
 }
 
 
@@ -65,10 +55,10 @@ let gridProperties = (x, y) => {
 		_real: xOffset + (x  - width / 2) / (width / (8 / zoom)),
 		_imaginary: yOffset + (y - height / 2) / -(height / (4 / zoom)),
 		_prev: {
-			//real: xOffset + (x  - width / 2) / (width / (8 / zoom)), //set values to zero if not using julia set
-			//imaginary: yOffset + (y - height / 2) / -(height / (4 / zoom)), 
-			real: 0, //set values to zero if not using julia set
-			imaginary: 0,
+			real: xOffset + (x  - width / 2) / (width / (8 / zoom)), //set values to zero if not using julia set
+			imaginary: yOffset + (y - height / 2) / -(height / (4 / zoom)), 
+			//real: 0, //set values to zero if not using julia set
+			//imaginary: 0,
 		},
 		changed: false,
 		_inSet: true,
@@ -81,12 +71,27 @@ let gridProperties = (x, y) => {
 		get inSet(){
 			return this._inSet
 		},
+		color : {
+			R: 0,
+			G: 0,
+			B: 255,
+		},
 		itterate(){
 			if (this.inSet == true){
 				//this._prev = shipCalc(this._prev, this.value);
-				this._prev = mandelbrotCalc(this._prev, this.value);
-				//this._prev = miscCalc(this._prev);
+				//this._prev = mandelbrotCalc(this._prev, this.value);
+				this._prev = miscCalc(this._prev);
 				this._inSet = (checkDivergance(this._prev));
+				if (this._inSet == false) {
+					if (itteration < changeTime) {
+						this.color.R += itteration * changeSpeed;
+						this.color.G += itteration * changeSpeed;
+					} else {
+						this.color.G -= (itteration - changeTime) * changeSpeed;
+						this.color.R += itteration * changeSpeed;
+						this.color.G += itteration * changeSpeed;
+					}
+				}
 			}	
 		}
 	}
@@ -136,8 +141,8 @@ function shipCalc(prev, current){
 
 function miscCalc(prev, current){ 
 	let squarePrev = [Math.pow(prev.real, 2) - Math.pow(prev.imaginary, 2), 2 * (prev.real * prev.imaginary)]
-	let realNums = squarePrev[0] - 0.3;
-	let imaginaryNums = squarePrev[1] - 0.7;
+	let realNums = squarePrev[0] + juliaVals[0];
+	let imaginaryNums = squarePrev[1] + juliaVals[1];
 	return {
 		real: realNums,
 		imaginary: imaginaryNums 	
